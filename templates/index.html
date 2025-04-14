@@ -38,6 +38,16 @@
                     批量分析
                 </button>
             </div>
+
+            <!-- 全部股票分析 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">全部股票分析</h2>
+                <p class="mb-4">点击下方按钮以获取推荐的全部股票分析结果。</p>
+                <button onclick="analyzeAllStocks()"
+                        class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+                    全部股票分析
+                </button>
+            </div>
         </div>
 
         <!-- 结果展示 -->
@@ -49,55 +59,27 @@
 
     <script>
         async function analyzeSingleStock() {
-            const stockCode = document.getElementById('singleStock').value.trim();
-            if (!stockCode) {
-                alert('请输入股票代码');
-                return;
-            }
+            // 单只股票分析逻辑
+        }
 
+        async function analyzeBatchStocks() {
+            // 批量股票分析逻辑
+        }
+
+        async function analyzeAllStocks() {
             try {
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
+                const response = await fetch('/api/all-stocks-analysis', {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ stock_code: stockCode })
                 });
 
                 const result = await response.json();
                 if (response.ok) {
-                    displayResults([result]);
+                    displayResults(result);
                 } else {
                     alert(result.error || '分析失败');
-                }
-            } catch (error) {
-                alert('请求失败: ' + error.message);
-            }
-        }
-
-        async function analyzeBatchStocks() {
-            const stocksText = document.getElementById('batchStocks').value.trim();
-            if (!stocksText) {
-                alert('请输入股票代码');
-                return;
-            }
-
-            const stockList = stocksText.split('\n').map(s => s.trim()).filter(s => s);
-
-            try {
-                const response = await fetch('/api/batch-analyze', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ stock_list: stockList })
-                });
-
-                const results = await response.json();
-                if (response.ok) {
-                    displayResults(results);
-                } else {
-                    alert(results.error || '分析失败');
                 }
             } catch (error) {
                 alert('请求失败: ' + error.message);
@@ -112,22 +94,8 @@
                 html += `
                     <div class="mb-8 p-4 border rounded">
                         <h3 class="text-lg font-semibold mb-2">股票代码: ${result.stock_code}</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p><strong>分析日期:</strong> ${result.analysis_date}</p>
-                                <p><strong>当前价格:</strong> ¥${result.price.toFixed(2)}</p>
-                                <p><strong>价格变动:</strong> ${result.price_change.toFixed(2)}%</p>
-                            </div>
-                            <div>
-                                <p><strong>综合评分:</strong> ${result.score}分</p>
-                                <p><strong>投资建议:</strong> ${result.recommendation}</p>
-                                <p><strong>RSI指标:</strong> ${result.rsi.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <h4 class="font-semibold mb-2">AI分析:</h4>
-                            <p class="whitespace-pre-line">${result.ai_analysis}</p>
-                        </div>
+                        <p>综合评分: ${result.score}</p>
+                        <p>投资建议: ${result.recommendation}</p>
                     </div>
                 `;
             });
